@@ -16,6 +16,7 @@ io.on("connection", (socket) => {
 
   // Add new player to the players object
   players[socket.id] = {
+    id: socket.id,
     x: 25,
     y: 20,
   };
@@ -32,6 +33,7 @@ io.on("connection", (socket) => {
 
   // Listen for player movement
   socket.on("playerMovement", (movementData) => {
+    console.log("Received playerMovement:", movementData);
     players[socket.id] = movementData;
     // Broadcast the movement to other players
     socket.broadcast.emit("playerMoved", {
