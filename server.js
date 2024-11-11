@@ -25,22 +25,13 @@ io.on("connection", (socket) => {
   socket.emit("currentPlayers", players);
 
   // Notify existing players of the new player
-  socket.broadcast.emit("newPlayer", {
-    id: socket.id,
-    x: players[socket.id].x,
-    y: players[socket.id].y,
-  });
-
+  socket.broadcast.emit("newPlayer", players[socket.id]);
   // Listen for player movement
   socket.on("playerMovement", (movementData) => {
     console.log("Received playerMovement:", movementData);
     players[socket.id] = movementData;
     // Broadcast the movement to other players
-    socket.broadcast.emit("playerMoved", {
-      id: socket.id,
-      x: movementData.x,
-      y: movementData.y,
-    });
+    socket.broadcast.emit("playerMoved", players[socket.id]);
   });
 
   // Handle player disconnect
