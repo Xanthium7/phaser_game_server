@@ -23,7 +23,8 @@ io.on("connection", (socket) => {
 
   // Send the current players to the new player
   socket.emit("currentPlayers", players);
-
+  console.log("Sent currentPlayers:", players);
+  //
   // Notify existing players of the new player
   socket.broadcast.emit("newPlayer", players[socket.id]);
   // Listen for player movement
