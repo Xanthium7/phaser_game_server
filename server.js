@@ -22,8 +22,11 @@ io.on("connection", (socket) => {
   };
 
   // Send the current players to the new player
-  socket.emit("currentPlayers", players);
-  console.log("Sent currentPlayers:", players);
+  socket.on("getCurrentPlayers", () => {
+    // Send the current players to the requesting client
+    socket.emit("currentPlayers", players);
+    console.log("Sent currentPlayers upon request:", players);
+  });
   //
   // Notify existing players of the new player
   socket.broadcast.emit("newPlayer", players[socket.id]);
