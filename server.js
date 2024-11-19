@@ -9,8 +9,6 @@ const io = new Server(httpServer, {
   },
 });
 
-let players = {};
-
 io.on("connection", (socket) => {
   const { roomId } = socket.handshake.query;
   socket.join(roomId);
