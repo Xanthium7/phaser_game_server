@@ -12,7 +12,17 @@ const io = new Server(httpServer, {
 let players = {};
 
 io.on("connection", (socket) => {
-  console.log(`Player connected: ${socket.id}`);
+  const { roomId } = socket.handshake.query;
+  socket.join(roomId);
+  console.log(`Player connected: ${socket.id} joined room: ${roomId}`);
+
+  // Initialize players object for the room if it doesn't exist
+  if (!io.sockets.adapter.rooms.get(roomId).players) {
+    io.sockets.adapter.rooms.get(roomId).players = {};
+  }
+
+  // Reference to players in the room
+  const players = io.sockets.adapter.rooms.get(roomId).players;
 
   // Add new player to the players object
   players[socket.id] = {
@@ -21,21 +31,20 @@ io.on("connection", (socket) => {
     y: 20,
   };
 
-  // Send the current players to the new player
+  // ** socket.broadcast.emit() is same as socket.to(roomId).emit() [notfying all palyers]**
+
   socket.on("getCurrentPlayers", () => {
-    // Send the current players to the requesting client
     socket.emit("currentPlayers", players);
     console.log("Sent currentPlayers upon request:", players);
   });
-  //
-  // Notify existing players of the new player
-  socket.broadcast.emit("newPlayer", players[socket.id]);
-  // Listen for player movement
+
+  socket.to(roomId).emit("newPlayer", players[socket.id]);
+
   socket.on("playerMovement", (movementData) => {
     console.log("Received playerMovement:", movementData);
     players[socket.id] = movementData;
-    // Broadcast the movement to other players
-    socket.broadcast.emit("playerMoved", players[socket.id]);
+
+    socket.to(roomId).emit("playerMoved", players[socket.id]);
   });
 
   // Handle player disconnect
