@@ -10,7 +10,7 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  const { roomId } = socket.handshake.query;
+  const { roomId, playername } = socket.handshake.query;
   socket.join(roomId);
   console.log(`Player connected: ${socket.id} joined room: ${roomId}`);
 
@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
     id: socket.id,
     x: 25,
     y: 20,
+    name: playername || "Bigg NIgga",
   };
 
   // ** socket.broadcast.emit() is same as socket.to(roomId).emit() [notfying all palyers]**
@@ -40,7 +41,7 @@ io.on("connection", (socket) => {
 
   socket.on("playerMovement", (movementData) => {
     console.log("Received playerMovement:", movementData);
-    players[socket.id] = movementData;
+    players[socket.id] = { ...players[socket.id], ...movementData };
 
     socket.to(roomId).emit("playerMoved", players[socket.id]);
   });
