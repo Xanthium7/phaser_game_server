@@ -1,6 +1,7 @@
 // server/server.js
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+const roomChat = require("./roomChat");
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
