@@ -48,6 +48,9 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("playerMoved", players[socket.id]);
   });
 
+  // Chat message handling
+  roomChat(io, socket);
+
   // Handle player disconnect
   socket.on("disconnect", () => {
     console.log(`Player disconnected: ${socket.id}`);
