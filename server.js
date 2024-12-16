@@ -26,8 +26,8 @@ io.on("connection", (socket) => {
   // Add new player to the players object
   players[socket.id] = {
     id: socket.id,
-    x: 25,
-    y: 20,
+    x: 130,
+    y: 80,
     name: playername || "Player",
   };
 
