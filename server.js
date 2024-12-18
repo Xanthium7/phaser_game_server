@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
   // Reference to players in the room
   const players = io.sockets.adapter.rooms.get(roomId).players;
 
-  // Add new player to the players object
+  // Add new player to the players AND the starting position
   players[socket.id] = {
     id: socket.id,
     x: 130,
@@ -46,6 +46,33 @@ io.on("connection", (socket) => {
     players[socket.id].y = movementData.y;
 
     socket.to(roomId).emit("playerMoved", players[socket.id]);
+  });
+
+  //*   Handling WebRTC
+
+  socket.on("video-offer", (data) => {
+    console.log("Received video-offer from");
+    socket.to(data.target).emit("video-offer", {
+      sdp: data.sdp,
+      sender: socket.id,
+    });
+  });
+
+  socket.on("video-answer", (data) => {
+    console.log("Received video-answer ");
+    socket.to(data.target).emit("video-answer", {
+      sdp: data.sdp,
+      sender: socket.id,
+    });
+  });
+
+  // This is the curcial thingy for Peer2Peer connection
+  socket.on("new-ice-candidate", (data) => {
+    console.log("Received new-ice-candidate");
+    socket.to(data.target).emit("new-ice-candidate", {
+      candidate: data.candidate,
+      sender: socket.id,
+    });
   });
 
   // Chat message handling
