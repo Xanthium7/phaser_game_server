@@ -75,6 +75,15 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("initiate-video-call", ({ targets }) => {
+    targets.forEach((targetId) => {
+      socket.to(targetId).emit("initiate-video-call", {
+        targets,
+        sender: socket.id,
+      });
+    });
+  });
+
   // Chat message handling
   roomChat(io, socket);
 
