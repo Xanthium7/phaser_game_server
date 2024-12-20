@@ -55,8 +55,8 @@ io.on("connection", (socket) => {
   });
 
   // Handle acceptance of the call
-  socket.on("accept-video-call", ({ to }) => {
-    socket.to(to).emit("video-call-accepted", { from: socket.id });
+  socket.on("accept-video-call", ({ callerId }) => {
+    socket.to(callerId).emit("call-accepted", { from: socket.id });
   });
 
   // Existing signaling handlers
