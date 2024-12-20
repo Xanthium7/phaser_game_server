@@ -50,8 +50,17 @@ io.on("connection", (socket) => {
 
   //*   Handling WebRTC
 
+  socket.on("initiate-video-call", ({ targetId }) => {
+    socket.to(targetId).emit("video-call-offer", { from: socket.id });
+  });
+
+  // Handle acceptance of the call
+  socket.on("accept-video-call", ({ to }) => {
+    socket.to(to).emit("video-call-accepted", { from: socket.id });
+  });
+
+  // Existing signaling handlers
   socket.on("video-offer", (data) => {
-    console.log("Received video-offer from");
     socket.to(data.target).emit("video-offer", {
       sdp: data.sdp,
       sender: socket.id,
@@ -59,31 +68,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("video-answer", (data) => {
-    console.log("Received video-answer ");
     socket.to(data.target).emit("video-answer", {
       sdp: data.sdp,
       sender: socket.id,
     });
   });
 
-  // This is the curcial thingy for Peer2Peer connection
   socket.on("new-ice-candidate", (data) => {
-    console.log("Received new-ice-candidate");
     socket.to(data.target).emit("new-ice-candidate", {
       candidate: data.candidate,
       sender: socket.id,
     });
   });
-
-  socket.on("initiate-video-call", ({ targets }) => {
-    targets.forEach((targetId) => {
-      socket.to(targetId).emit("initiate-video-call", {
-        targets,
-        sender: socket.id,
-      });
-    });
-  });
-
   // Chat message handling
   roomChat(io, socket);
 
