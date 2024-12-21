@@ -51,23 +51,25 @@ io.on("connection", (socket) => {
   //*   Handling WebRTC
 
   socket.on("initiate-video-call", ({ targetId }) => {
+    console.log("Initiating video call to:", targetId);
     socket.to(targetId).emit("video-call-offer", { from: socket.id });
   });
 
-  // Handle acceptance of the call
   socket.on("accept-video-call", ({ callerId }) => {
+    console.log("Call accepted by:", socket.id, "for caller:", callerId);
     socket.to(callerId).emit("call-accepted", { from: socket.id });
   });
 
   // Existing signaling handlers
   socket.on("video-offer", (data) => {
+    console.log("Relaying video offer to:", data.target);
     socket.to(data.target).emit("video-offer", {
       sdp: data.sdp,
       sender: socket.id,
     });
   });
-
   socket.on("video-answer", (data) => {
+    console.log("Relaying video answer to:", data.target);
     socket.to(data.target).emit("video-answer", {
       sdp: data.sdp,
       sender: socket.id,
@@ -75,6 +77,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-ice-candidate", (data) => {
+    console.log("Relaying ICE candidate to:", data.target);
     socket.to(data.target).emit("new-ice-candidate", {
       candidate: data.candidate,
       sender: socket.id,
