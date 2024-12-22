@@ -52,7 +52,13 @@ io.on("connection", (socket) => {
 
   socket.on("initiate-video-call", ({ targetId }) => {
     console.log("Initiating video call to:", targetId);
-    socket.to(targetId).emit("video-call-offer", { from: socket.id });
+    // This target id is basically the socket id of the player we want to call
+    socket
+      .to(targetId)
+      .emit("video-call-offer", {
+        from: socket.id,
+        name: players[socket.id].name,
+      });
   });
 
   socket.on("accept-video-call", ({ callerId }) => {
