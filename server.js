@@ -53,12 +53,10 @@ io.on("connection", (socket) => {
   socket.on("initiate-video-call", ({ targetId }) => {
     console.log("Initiating video call to:", targetId);
     // This target id is basically the socket id of the player we want to call
-    socket
-      .to(targetId)
-      .emit("video-call-offer", {
-        from: socket.id,
-        name: players[socket.id].name,
-      });
+    socket.to(targetId).emit("video-call-offer", {
+      from: socket.id,
+      name: players[socket.id].name,
+    });
   });
 
   socket.on("accept-video-call", ({ callerId }) => {
@@ -89,6 +87,11 @@ io.on("connection", (socket) => {
       sender: socket.id,
     });
   });
+
+  socket.on("end-call", ({ targetId }) => {
+    socket.to(targetId).emit("end-call");
+  });
+
   // Chat message handling
   roomChat(io, socket);
 
