@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
   socket.to(roomId).emit("newPlayer", players[socket.id]);
 
   socket.on("playerMovement", (movementData) => {
-    console.log("Received playerMovement:", movementData);
+    // console.log("Received playerMovement:", movementData);
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
     players[socket.id].speed = movementData.speed;
