@@ -92,7 +92,28 @@ io.on("connection", (socket) => {
     socket.to(targetId).emit("end-call");
   });
 
-  // Chat message handling
+  //* MUSIC PLAYER
+  socket.on("showJukeboxModal", () => {
+    socket.emit("showJukeboxModal");
+  });
+
+  socket.on("playPlaylist", (playlistLink) => {
+    io.to(roomId).emit("playPlaylist", { playlistLink }); // everyplayer includingthe current player, ina room
+  });
+
+  socket.on("pausePlaylist", () => {
+    io.to(roomId).emit("pausePlaylist");
+  });
+
+  socket.on("skipSong", () => {
+    io.to(roomId).emit("skipSong");
+  });
+
+  socket.on("stopPlaylist", () => {
+    io.to(roomId).emit("stopPlaylist");
+  });
+
+  //* Chat message handling
   roomChat(io, socket);
 
   // Handle player disconnect
