@@ -115,6 +115,9 @@ io.on("connection", (socket) => {
   socket.on("skipSong", () => {
     io.to(roomId).emit("skipSong");
   });
+  socket.on("prevSong", () => {
+    io.to(roomId).emit("prevSong");
+  });
 
   socket.on("stopPlaylist", () => {
     io.to(roomId).emit("stopPlaylist");
