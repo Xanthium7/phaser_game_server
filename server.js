@@ -29,6 +29,7 @@ io.on("connection", (socket) => {
     x: 130,
     y: 80,
     name: playername || "Player",
+    speed: 4,
   };
 
   // ** socket.broadcast.emit() is same as socket.to(roomId).emit() [notfying all palyers]**
@@ -44,6 +45,7 @@ io.on("connection", (socket) => {
     console.log("Received playerMovement:", movementData);
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
+    players[socket.id].speed = movementData.speed;
 
     socket.to(roomId).emit("playerMoved", players[socket.id]);
   });
