@@ -97,12 +97,19 @@ io.on("connection", (socket) => {
     socket.emit("showJukeboxModal");
   });
 
-  socket.on("playPlaylist", (playlistLink) => {
-    io.to(roomId).emit("playPlaylist", { playlistLink }); // everyplayer includingthe current player, ina room
+  socket.on("playPlaylist", ({ playlistLink }) => {
+    console.log(
+      `Broadcasting playPlaylist with link: ${playlistLink} to room: ${roomId}`
+    );
+    io.to(roomId).emit("playPlaylist", { playlistLink: playlistLink }); // everyplayer includingthe current player, ina room
   });
 
   socket.on("pausePlaylist", () => {
     io.to(roomId).emit("pausePlaylist");
+  });
+
+  socket.on("resumePlaylist", () => {
+    io.to(roomId).emit("resumePlaylist");
   });
 
   socket.on("skipSong", () => {
