@@ -5,7 +5,7 @@ const roomChat = require("./roomChat");
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Allow all origins (adjust in production)
+    origin: ["http://localhost:3000", "https://chillverse.vercel.app"], // Allow all origins (adjust in production)
   },
 });
 
