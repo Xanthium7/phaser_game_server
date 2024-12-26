@@ -1,4 +1,3 @@
-// server/server.js
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
@@ -128,12 +127,11 @@ io.on("connection", (socket) => {
   //* Chat message handling
   roomChat(io, socket);
 
-  // Handle player disconnect
   socket.on("disconnect", () => {
     console.log(`Player disconnected: ${socket.id}`);
-    // Remove from players object
+
     delete players[socket.id];
-    // Notify remaining players
+
     io.emit("playerDisconnected", socket.id);
   });
 });
