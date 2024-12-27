@@ -5,13 +5,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-  "dev": "nodemon server.js"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "Akshhay",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@azure/web-pubsub-socket.io": "^1.2.0",
     "socket.io": "^4.8.1"
   }
 }

@@ -1,6 +1,7 @@
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
+const { useAzureSocketIO } = require("@azure/web-pubsub-socket.io");
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -8,6 +9,12 @@ const io = new Server(httpServer, {
     origin: ["http://localhost:3000", "https://chillverse.vercel.app"],
   },
 });
+useAzureSocketIO(io, {
+  hub: "Hub", // The hub name can be any valid string.
+  connectionString: process.argv[2],
+});
+
+const roomPlayers = new Map();
 
 io.on("connection", (socket) => {
   const { roomId, playername } = socket.handshake.query;
@@ -15,12 +22,12 @@ io.on("connection", (socket) => {
   console.log(`Player connected: ${socket.id} joined room: ${roomId}`);
 
   // Initialize players object for the room if it doesn't exist
-  if (!io.sockets.adapter.rooms.get(roomId).players) {
-    io.sockets.adapter.rooms.get(roomId).players = {};
+  if (!roomPlayers.has(roomId)) {
+    roomPlayers.set(roomId, {});
   }
 
   // Reference to players in the room
-  const players = io.sockets.adapter.rooms.get(roomId).players;
+  const players = roomPlayers.get(roomId);
 
   // Add new player to the players AND the starting position
   players[socket.id] = {
@@ -136,6 +143,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3001, () => {
-  console.log("Server is listening on port 3001");
+const PORT = process.env.PORT || 3001;
+httpServer.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
