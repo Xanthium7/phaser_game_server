@@ -12,7 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@azure/web-pubsub-socket.io": "^1.2.0",
+    "@azure/web-pubsub-socket.io": "^1.1.0",
+    "dotenv": "^16.4.7",
     "socket.io": "^4.8.1"
   }
 }
