@@ -4,7 +4,12 @@ const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
 const { useAzureSocketIO } = require("@azure/web-pubsub-socket.io");
 
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("OK");
+  }
+});
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:3000", "https://chillverse.vercel.app"],
