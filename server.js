@@ -11,12 +11,10 @@ const io = new Server(httpServer, {
   },
 });
 
-// console.log(process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING);
-
-useAzureSocketIO(io, {
-  hub: "Hub", // The hub name can be any valid string.
-  connectionString: process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING,
-});
+// useAzureSocketIO(io, {
+//   hub: "Hub", // The hub name can be any valid string.
+//   connectionString: process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING,
+// });
 
 const roomPlayers = new Map();
 
