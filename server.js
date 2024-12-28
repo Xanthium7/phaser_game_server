@@ -13,6 +13,7 @@ const httpServer = createServer((req, res) => {
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:3000", "https://chillverse.vercel.app"],
+    methods: ["GET", "POST"],
   },
 });
 
@@ -20,6 +21,11 @@ const io = new Server(httpServer, {
 //   hub: "Hub", // The hub name can be any valid string.
 //   connectionString: process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING,
 // });
+
+const PORT = process.env.PORT;
+httpServer.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
 
 const roomPlayers = new Map();
 
@@ -148,9 +154,4 @@ io.on("connection", (socket) => {
 
     io.emit("playerDisconnected", socket.id);
   });
-});
-
-const PORT = process.env.PORT || 8080;
-httpServer.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
 });
