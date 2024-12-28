@@ -1,3 +1,4 @@
+require("dotenv").config({ path: ".env.local" });
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
@@ -9,9 +10,12 @@ const io = new Server(httpServer, {
     origin: ["http://localhost:3000", "https://chillverse.vercel.app"],
   },
 });
+
+// console.log(process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING);
+
 useAzureSocketIO(io, {
   hub: "Hub", // The hub name can be any valid string.
-  connectionString: process.argv[2],
+  connectionString: process.env.AZURE_WEB_PUBSUB_CONNECTION_STRING,
 });
 
 const roomPlayers = new Map();
