@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
