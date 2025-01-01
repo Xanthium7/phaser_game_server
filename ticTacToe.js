@@ -1,3 +1,10 @@
+const { v4: uuidv4 } = require("uuid"); // For generating unique room IDs
+
+// Initialize a waiting queue
+if (!module.exports.waitingPlayers) {
+  module.exports.waitingPlayers = {};
+}
+
 module.exports = function (io, socket) {
   const { roomId, playername } = socket.handshake.query;
 
@@ -5,45 +12,77 @@ module.exports = function (io, socket) {
     io.games = {};
   }
 
-  if (!io.games[roomId]) {
-    io.games[roomId] = {
-      players: {},
-      board: Array(9).fill(null),
-      currentTurn: null,
-      winner: null,
-    };
-  }
-  const game = io.games[roomId];
+  // Handle startTicTacToe event
+  socket.on("startTicTacToe", () => {
+    if (!module.exports.waitingPlayers[roomId]) {
+      // No player waiting, mark this socket as waiting
+      module.exports.waitingPlayers[roomId] = socket.id;
+      socket.emit("waitingForPlayer");
+    } else {
+      // Found a waiting player, pair them
+      const waitingSocketId = module.exports.waitingPlayers[roomId];
+      delete module.exports.waitingPlayers[roomId];
 
-  //adding the player part
-  game.players[socket.id] = {
-    id: socket.id,
-    name: playername || "hehe",
-    symbol: null, // 'X' or 'O'
-  };
+      // Create a unique game room id
+      const gameRoomId = uuidv4();
+      // Join both sockets to the game room
+      socket.join(gameRoomId);
+      const waitingSocket = io.sockets.sockets.get(waitingSocketId);
+      if (waitingSocket) {
+        waitingSocket.join(gameRoomId);
 
-  const playerCount = Object.keys(game.players).length;
-  if (playerCount === 1) {
-    game.players[socket.id].symbol = "X";
-    game.currentTurn = socket.id;
-    socket.emit("gameStart", {
-      symbol: "X",
-      board: game.board,
-      currentTurn: game.currentTurn,
-    });
-  } else if (playerCount === 2) {
-    game.players[socket.id].symbol = "O";
-    // notify both players
-    io.to(roomId).emit("gameStart", {
-      symbol: "O",
-      board: game.board,
-      currentTurn: game.currentTurn,
-    });
-  } else {
-    socket.emit("gameFull");
-  }
+        // Initialize game state
+        io.games[gameRoomId] = {
+          players: {},
+          board: Array(9).fill(null),
+          currentTurn: null,
+          winner: null,
+        };
 
-  socket.on("makeMove", (index) => {
+        // Assign symbols
+        io.games[gameRoomId].players[waitingSocketId] = {
+          id: waitingSocketId,
+          name: playername || "Player",
+          symbol: "X",
+        };
+        io.games[gameRoomId].players[socket.id] = {
+          id: socket.id,
+          name: playername || "Player",
+          symbol: "O",
+        };
+
+        // Set current turn
+        io.games[gameRoomId].currentTurn = waitingSocketId;
+
+        // Emit gameStart to both players with roomId
+        waitingSocket.emit("gameStart", {
+          symbol: "X",
+          board: io.games[gameRoomId].board,
+          currentTurn: io.games[gameRoomId].currentTurn,
+          roomId: gameRoomId,
+        });
+        socket.emit("gameStart", {
+          symbol: "O",
+          board: io.games[gameRoomId].board,
+          currentTurn: io.games[gameRoomId].currentTurn,
+          roomId: gameRoomId,
+        });
+      } else {
+        // Waiting socket was disconnected before pairing
+        socket.emit("waitingForPlayer");
+      }
+    }
+  });
+
+  // Handle player's move
+  socket.on("makeMove", (data) => {
+    const { index, roomId } = data;
+    const game = io.games[roomId];
+    if (!game) {
+      socket.emit("invalidMove", "Game not found.");
+      return;
+    }
+
     if (game.winner) {
       socket.emit("invalidMove", "Game has already been won.");
       return;
@@ -108,15 +147,27 @@ module.exports = function (io, socket) {
 
   // Handle disconnection
   socket.on("disconnect", () => {
-    delete game.players[socket.id];
-    io.to(roomId).emit("playerDisconnected", socket.id);
+    // Remove from waiting players if in waiting
+    if (module.exports.waitingPlayers[roomId] === socket.id) {
+      delete module.exports.waitingPlayers[roomId];
+    }
 
-    // Reset game if a player disconnects
-    game.board = Array(9).fill(null);
-    game.currentTurn = null;
-    game.winner = null;
+    // Find all games this socket is in
+    for (const gameRoomId in io.games) {
+      const game = io.games[gameRoomId];
+      if (game.players[socket.id]) {
+        delete game.players[socket.id];
+        io.to(gameRoomId).emit("playerDisconnected", socket.id);
 
-    // Notify remaining players
-    io.to(roomId).emit("gameReset", { board: game.board });
+        // Reset game
+        game.board = Array(9).fill(null);
+        game.currentTurn = null;
+        game.winner = null;
+
+        // Notify remaining players
+        io.to(gameRoomId).emit("gameReset", { board: game.board });
+        break;
+      }
+    }
   });
 };
