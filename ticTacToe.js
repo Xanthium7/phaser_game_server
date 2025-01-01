@@ -13,30 +13,31 @@ module.exports = function (io, socket) {
       winner: null,
     };
   }
+  const game = io.games[roomId];
 
   //adding the player part
-  games.players[socket.id] = {
+  game.players[socket.id] = {
     id: socket.id,
     name: playername || "hehe",
     symbol: null, // 'X' or 'O'
   };
 
-  const playerCount = Object.keys(io.games.players).length;
+  const playerCount = Object.keys(game.players).length;
   if (playerCount === 1) {
-    games.players[socket.id].symbol = "X";
-    games.currentTurn = socket.id;
+    game.players[socket.id].symbol = "X";
+    game.currentTurn = socket.id;
     socket.emit("gameStart", {
       symbol: "X",
-      board: games.board,
-      currentTurn: games.currentTurn,
+      board: game.board,
+      currentTurn: game.currentTurn,
     });
   } else if (playerCount === 2) {
-    games.players[socket.id].symbol = "O";
+    game.players[socket.id].symbol = "O";
     // notify both players
     io.to(roomId).emit("gameStart", {
       symbol: "O",
-      board: games.board,
-      currentTurn: games.currentTurn,
+      board: game.board,
+      currentTurn: game.currentTurn,
     });
   } else {
     socket.emit("gameFull");

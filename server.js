@@ -2,7 +2,7 @@ require("dotenv").config({ path: ".env.local" });
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
-const { useAzureSocketIO } = require("@azure/web-pubsub-socket.io");
+const ticTacToe = require("./ticTacToe");
 
 const httpServer = createServer((req, res) => {
   if (req.method === "GET" && req.url === "/") {
@@ -146,6 +146,8 @@ io.on("connection", (socket) => {
 
   //* Chat message handling
   roomChat(io, socket);
+  //* Tic-Tac-Toe handling
+  ticTacToe(io, socket);
 
   socket.on("disconnect", () => {
     console.log(`Player disconnected: ${socket.id}`);
