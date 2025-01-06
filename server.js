@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
   //* Chat message handling
   roomChat(io, socket);
   //* Tic-Tac-Toe handling
-  ticTacToe(io, socket);
+  // ticTacToe(io, socket);
 
   socket.on("disconnect", () => {
     console.log(`Player disconnected: ${socket.id}`);
