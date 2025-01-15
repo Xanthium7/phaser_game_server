@@ -1,4 +1,6 @@
 require("dotenv").config({ path: ".env.local" });
+// const { PrismaClient } = require("@prisma/client");
+// const prisma = new PrismaClient();
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const roomChat = require("./roomChat");
